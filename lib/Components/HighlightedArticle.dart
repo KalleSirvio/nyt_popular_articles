@@ -18,7 +18,7 @@ class HighlightedArticle extends StatelessWidget {
     const double imageSize = 1000;
     const double padding = 10;
     return SizedBox(
-      height: 270,
+      height: 320,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -40,38 +40,44 @@ class HighlightedArticle extends StatelessWidget {
             flex: 1,
             child: Column(
               children: [
-                Padding(
-                padding: const EdgeInsets.only(left: padding),
-                child: SizedBox(
-                  width: imageSize,
-                  child: Text(
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold
-
-                    ),
-                  articleTitle),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: padding, right: padding),
-                child: SizedBox(
-                        width: imageSize,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                                style: const TextStyle(color: Colors.blue,),
-                                category),
-                            Text(
-                                style: TextStyle(color: Colors.grey[500]),
-                                textAlign: TextAlign.end,
-                                timeSincePublished),
-                          ],
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                  padding: const EdgeInsets.only(left: padding),
+                    child: SizedBox(
+                      width: imageSize,
+                      child: Text(
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold
+                
                         ),
-                      ),
-              ),
+                      articleTitle),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: padding, right: padding),
+                    child: SizedBox(
+                            width: imageSize,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    style: const TextStyle(color: Colors.blue,),
+                                    category),
+                                Text(
+                                    style: TextStyle(color: Colors.grey[500]),
+                                    textAlign: TextAlign.end,
+                                    timeSincePublished),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
             const Padding(
               padding: EdgeInsets.only(left: padding + 60, right: padding),
               child: Divider(color: Colors.grey),

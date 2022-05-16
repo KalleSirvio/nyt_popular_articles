@@ -1,10 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nyt_popular_articles/Components/ArticleList.dart';
+import 'package:nyt_popular_articles/Components/ArticleViewer.dart';
 import 'package:nyt_popular_articles/Components/CategorySelector.dart';
+import 'package:nyt_popular_articles/Controllers/DataFetcher.dart';
 import 'package:nyt_popular_articles/Models/ArticleModel.dart';
 
 void main(List<String> args) {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    initialRoute: '/',
+    routes: {
+      '/': (context) => const MyApp(),
+      '/article_viewer': (context) => const ArticleViewer(),
+    },
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -15,78 +25,69 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<ArticleModel> articleModelList = [
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum jdnfvcsökj sdvjklnsdvjknösd jknk okjnköjdsnvsökjv kjnöncvkönj ökjnvökjv nökjlond njdscökjlcvsoökjsnvös jnnjsdv öjksdöj vnsönsdövsndv nsdv",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum jdnfvcsökj sdvjklnsdvjknösd jknk okjnköjdsnvsökjv kjnöncvkönj ökjnvökjv nökjlond njdscökjlcvsoökjsnvös jnnjsdv öjksdöj vnsönsdövsndv nsdv",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum jdnfvcsökj sdvjklnsdvjknösd jknk okjnköjdsnvsökjv kjnöncvkönj ökjnvökjv nökjlond njdscökjlcvsoökjsnvös jnnjsdv öjksdöj vnsönsdövsndv nsdv",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum jdnfvcsökj sdvjklnsdvjknösd jknk okjnköjdsnvsökjv kjnöncvkönj ökjnvökjv nökjlond njdscökjlcvsoökjsnvös jnnjsdv öjksdöj vnsönsdövsndv nsdv",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum jdnfvcsökj sdvjklnsdvjknösd jknk okjnköjdsnvsökjv kjnöncvkönj ökjnvökjv nökjlond njdscökjlcvsoökjsnvös jnnjsdv öjksdöj vnsönsdövsndv nsdv",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-    ArticleModel(
-      articleTitle: "Article title",
-      abstract: "Lorem ipsum",
-      timeSincePublished: "8m ago",
-      imageUrl:"https://www.aviary.org/wp-content/uploads/2020/09/owl-o-ween-for-web-e1602272060600.png",
-      category: "Category",
-    ),
-  ];
+  @override
+  void initState() {
+    updateCategories(currentCategory);
+    super.initState();
+  }
+
+  String currentCategory = "home";
+  DataFetcher dataFetcher = DataFetcher();
+
+  List<ArticleModel> articleModelList = [];
   Function(String) get changeCategory => (category) {
         debugPrint("Category changed to: $category");
+        currentCategory = category;
+        updateCategories(currentCategory);
       };
+
+  void updateCategories(String category) {
+    articleModelList.clear();
+    dataFetcher.fetchArticles(currentCategory).then((response) {
+      debugPrint(response.headers.values.toString());
+      var data = jsonDecode(response.body);
+      Iterable results = (data["results"]);
+      for (var result in results) {
+        if (result["title"] != null || result["title"] != "") {
+          ArticleModel model = ArticleModel(
+            articleTitle: result["title"] ?? "",
+            abstract: result["abstract"] ?? "",
+            articleUrl: result["url"] ?? "",
+            category: result["subsection"] ?? "",
+            imageUrl: result["multimedia"] != null
+                ? result["multimedia"][0]["url"]
+                : "",
+            publishedDate: result["published_date"] ?? "",
+          );
+          articleModelList.add(model);
+        }
+      }
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          bottomOpacity: 0,
-          elevation: 0,
-          backgroundColor: Colors.white,
-          title: const Text("NY Times"),
-          titleTextStyle: const TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-          centerTitle: true,
+    return Scaffold(
+      appBar: AppBar(
+        bottomOpacity: 0,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text("NY Times"),
+        titleTextStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
         ),
-        body: SizedBox(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CategorySelector(selectCategory: (text) => changeCategory(text)),
-              Expanded(child: ArticleList(articleModelList: articleModelList)),
-            ],
-          ),
+        centerTitle: true,
+      ),
+      body: SizedBox(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CategorySelector(selectCategory: (text) => changeCategory(text)),
+            Expanded(child: ArticleList(articleModelList: articleModelList)),
+          ],
         ),
       ),
     );

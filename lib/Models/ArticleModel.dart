@@ -1,12 +1,16 @@
 class ArticleModel {
   final String articleTitle;
   final String abstract;
-  final String timeSincePublished;
+  final String publishedDate;
   final String imageUrl;
   final String category;
-  ArticleModel({required this.category, 
+  final String articleUrl;
+
+  ArticleModel(
+      {required this.articleUrl,
+      required this.category,
       required this.abstract,
-      required this.timeSincePublished,
+      required this.publishedDate,
       required this.imageUrl,
       required this.articleTitle});
 }
